@@ -1,4 +1,5 @@
 Overview
+
 This is a PyQt-based desktop application for restaurants to manage orders, tables, inventory, and sales reports.
 
 Features
@@ -19,10 +20,17 @@ python main.py
 ```
 
 File Structure
+
 ```main.py``` - Entry point for the application.
+
 ```tables.py``` - Handles table and QR code management.
+
 ```inventory.py``` - Manages stock and product CRUD operations.
+
 ```orders.py``` - Handles order-taking and processing.
+
 ```reports.py``` - Generates sales reports.
+
 ```database/``` - Contains MySQL database connection files.
+
 ```assets/``` - Icons, images, and other UI assets.
