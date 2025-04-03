@@ -1,32 +1,28 @@
-Features:
-* Restaurant & Table Management: Add, update, and delete restaurants and tables.
-* Inventory & Menu Management: Manage food categories, stock, and availability.
-* Order Management: View and process customer orders.
-* Admin Authentication: Secure login/logout for restaurant owners.
-* Dashboard Analytics: View statistics on restaurants, tables, orders, and inventory.
-* Geolocation Integration: Convert restaurant addresses to coordinates for map-based features.
+Overview
+This is a PyQt-based desktop application for restaurants to manage orders, tables, inventory, and sales reports.
 
-Technologies Used:
-* Node.js + Express.js (Backend)
-* EJS (Templating)
-* Supabase (Database)
-* SCSS (Styling)
-* OpenStreetMap API (Geolocation)
+Features
+* Room & Table Management: CRUD operations with QR code generation.
+* Inventory Management: Add/update/delete food items and manage stock levels.
+* Order Management: Take and track orders per table.
+* Sales Reporting: Generate reports (daily, weekly, monthly, department-wise, item-wise).
+* User Management: Roles - Admin, Owner, Employee/Waiter.
 
-Setup Instructions:
+Installation & Setup
 1. Install dependencies:
-  ```
-  npm install
-  ```
-3. Set up .env file with:
-   ```
-   SUPABASE_URL=
-   SUPABASE_ANON_KEY=
-   ADMIN_EMAIL=
-   ADMIN_PASSWORD=
-   ```
-4. Start the server
-   ```
-   npm start
-   ```
-6. Access Admin Panel at: http://localhost:3000/admin/login
+```
+pip install -r requirements.txt
+```
+Run the application:
+```
+python main.py
+```
+
+File Structure
+```main.py``` - Entry point for the application.
+```tables.py``` - Handles table and QR code management.
+```inventory.py``` - Manages stock and product CRUD operations.
+```orders.py``` - Handles order-taking and processing.
+```reports.py``` - Generates sales reports.
+```database/``` - Contains MySQL database connection files.
+```assets/``` - Icons, images, and other UI assets.
