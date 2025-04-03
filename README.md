@@ -15,14 +15,14 @@ Technologies Used:
 
 Setup Instructions:
 1. Install dependencies:
-  ''' npm install '''
+  ``` npm install ```
 2. Set up .env file with:
-   '''
+   ```
    SUPABASE_URL=
    SUPABASE_ANON_KEY=
    ADMIN_EMAIL=
    ADMIN_PASSWORD=
-   '''
+   ```
 3. Start the server
-   ''' npm start '''
+   ``` npm start ```
 4. Access Admin Panel at: http://localhost:3000/admin/login
