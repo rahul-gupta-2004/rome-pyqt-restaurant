@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView,
-    QPushButton, QLineEdit, QHBoxLayout, QComboBox, QMessageBox, QDialog, QLabel
+    QPushButton, QLineEdit, QHBoxLayout, QComboBox, QMessageBox, QDialog, QLabel, QCheckBox
 )
 from PyQt5.QtGui import QColor, QDoubleValidator
 from PyQt5.QtCore import Qt
@@ -52,7 +52,7 @@ def create_inventory_tab(restaurant_id):
             
             self.price_input = QLineEdit()
             self.price_input.setPlaceholderText("Price")
-            self.price_input.setValidator(QDoubleValidator(0.00, 99999.99, 2))  # Allow only numbers
+            self.price_input.setValidator(QDoubleValidator(0.00, 99999.99, 2))
             form_layout.addWidget(self.price_input)
             
             self.category_dropdown = QComboBox()
@@ -68,16 +68,20 @@ def create_inventory_tab(restaurant_id):
             
             # Table setup
             self.table_widget = QTableWidget()
-            self.table_widget.setColumnCount(8)  # Changed from 9 to 8
+            self.table_widget.setColumnCount(9)  # Added column for out of stock
             self.table_widget.setRowCount(1)
-            self.table_widget.setHorizontalHeaderLabels(["", "", "", "", "", "", "", ""])
+            self.table_widget.setHorizontalHeaderLabels(["", "", "", "", "", "", "", "", ""])
             self.table_widget.horizontalHeader().setVisible(False)
             self.table_widget.verticalHeader().setVisible(False)
             
             header = self.table_widget.horizontalHeader()
             header.setSectionResizeMode(QHeaderView.Stretch)
             
-            header_items = ["Sr. No.", "Category", "Veg", "Item Name", "Item Description", "Price (₹)", "Update", "Delete"]
+            header_items = [
+                "Sr. No.", "Category", "Veg", "Item Name", 
+                "Item Description", "Price (₹)", "Out of Stock", 
+                "Update", "Delete"
+            ]
             for col, header_text in enumerate(header_items):
                 header_item = QTableWidgetItem(header_text)
                 header_item.setTextAlignment(Qt.AlignCenter)
@@ -105,8 +109,7 @@ def create_inventory_tab(restaurant_id):
                 .order("is_veg", desc=True)\
                 .execute()
             
-            # Store the fetched inventory in a class attribute
-            self.inventory_items = response.data or []  # Store inventory data for filtering
+            self.inventory_items = response.data or []
             
             self.table_widget.setRowCount(len(self.inventory_items) + 1)
             
@@ -118,15 +121,46 @@ def create_inventory_tab(restaurant_id):
                 self.table_widget.setItem(row, 4, QTableWidgetItem(item.get("item_desc", "Unknown")))
                 self.table_widget.setItem(row, 5, QTableWidgetItem(f"₹{item.get('price', 0):.2f}"))
 
+                # Out of Stock Checkbox
+                out_of_stock_checkbox = QCheckBox()
+                out_of_stock_checkbox.setChecked(item.get("is_out_of_stock", False))
+                out_of_stock_checkbox.setEnabled(False)
+                out_of_stock_checkbox.stateChanged.connect(
+                    lambda state, item_id=item["item_id"]: self.update_out_of_stock_status(item_id, state == Qt.Checked)
+                )
+                self.table_widget.setCellWidget(row, 6, out_of_stock_checkbox)
+
                 update_button = QPushButton("Update")
                 update_button.setStyleSheet(f"background-color: {colors.color_1}; color: {colors.color_3}; border-radius: 5px; padding: 5px;")
                 update_button.clicked.connect(lambda _, i=item: self.show_update_dialog(i))
-                self.table_widget.setCellWidget(row, 6, update_button)  # Changed from 7 to 6
+                self.table_widget.setCellWidget(row, 7, update_button)
 
                 delete_button = QPushButton("Delete")
                 delete_button.setStyleSheet(f"background-color: {colors.color_1}; color: {colors.color_3}; border-radius: 5px; padding: 5px;")
                 delete_button.clicked.connect(lambda _, i=item: self.delete_item(i))
-                self.table_widget.setCellWidget(row, 7, delete_button)  # Changed from 8 to 7
+                self.table_widget.setCellWidget(row, 8, delete_button)
+        
+        def update_out_of_stock_status(self, item_id, is_out_of_stock):
+            """Update the out of stock status for an item"""
+            try:
+                supabase.table("inventory").update({"is_out_of_stock": is_out_of_stock})\
+                    .eq("item_id", item_id).execute()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to update status: {str(e)}")
+                self.load_inventory()  # Reload to revert any UI changes
+        
+        def filter_inventory(self):
+            """Filter inventory items based on search query"""
+            search_text = self.search_bar.text().strip().lower()
+            if not search_text:
+                self.display_inventory(self.inventory_items)
+                return
+            
+            filtered_items = [
+                item for item in self.inventory_items
+                if search_text in item.get("item_name", "").lower()
+            ]
+            self.display_inventory(filtered_items)
         
         def display_inventory(self, items):
             """Display filtered inventory items in the table"""
@@ -140,28 +174,23 @@ def create_inventory_tab(restaurant_id):
                 self.table_widget.setItem(row, 4, QTableWidgetItem(item.get("item_desc", "Unknown")))
                 self.table_widget.setItem(row, 5, QTableWidgetItem(f"₹{item.get('price', 0):.2f}"))
                 
+                # Out of Stock Checkbox
+                out_of_stock_checkbox = QCheckBox()
+                out_of_stock_checkbox.setChecked(item.get("is_out_of_stock", False))
+                out_of_stock_checkbox.stateChanged.connect(
+                    lambda state, item_id=item["item_id"]: self.update_out_of_stock_status(item_id, state == Qt.Checked)
+                )
+                self.table_widget.setCellWidget(row, 6, out_of_stock_checkbox)
+                
                 update_button = QPushButton("Update")
                 update_button.setStyleSheet(f"background-color: {colors.color_1}; color: {colors.color_3}; border-radius: 5px; padding: 5px;")
                 update_button.clicked.connect(lambda _, i=item: self.show_update_dialog(i))
-                self.table_widget.setCellWidget(row, 6, update_button)  # Changed from 7 to 6
+                self.table_widget.setCellWidget(row, 7, update_button)
                 
                 delete_button = QPushButton("Delete")
                 delete_button.setStyleSheet(f"background-color: {colors.color_1}; color: {colors.color_3}; border-radius: 5px; padding: 5px;")
                 delete_button.clicked.connect(lambda _, i=item: self.delete_item(i))
-                self.table_widget.setCellWidget(row, 7, delete_button)  # Changed from 8 to 7
-               
-        def filter_inventory(self):
-            """Filter inventory items based on search query"""
-            search_text = self.search_bar.text().strip().lower()
-            if not search_text:
-                self.display_inventory(self.inventory_items)  # Show all if search is empty
-                return
-            
-            filtered_items = [
-                item for item in self.inventory_items
-                if search_text in item.get("item_name", "").lower()
-            ]
-            self.display_inventory(filtered_items)
+                self.table_widget.setCellWidget(row, 8, delete_button)
         
         def add_item(self):
             """Add a new item to the inventory"""
@@ -181,13 +210,14 @@ def create_inventory_tab(restaurant_id):
                     "item_name": item_name,
                     "item_desc": item_desc,
                     "price": float(price_text),
+                    "is_out_of_stock": False  # Default to in stock
                 }
                 
                 supabase.table("inventory").insert(item_data).execute()
                 self.load_inventory()
                 QMessageBox.information(self, "Success", "Item added successfully!")
 
-                # Clear input fields after adding item
+                # Clear input fields
                 self.is_veg_dropdown.setCurrentIndex(0)
                 self.item_name_input.clear()
                 self.item_desc_input.clear()
@@ -210,7 +240,7 @@ def create_inventory_tab(restaurant_id):
             # Veg/Non-Veg Dropdown
             is_veg_dropdown = QComboBox()
             is_veg_dropdown.addItems(["Veg", "Non-Veg", "Egg"])
-            is_veg_dropdown.setCurrentText(item["is_veg"])  # Set current value
+            is_veg_dropdown.setCurrentText(item["is_veg"])
             layout.addWidget(QLabel("Veg/Non-Veg:"))
             layout.addWidget(is_veg_dropdown)
 
@@ -237,12 +267,23 @@ def create_inventory_tab(restaurant_id):
             layout.addWidget(QLabel("Price (₹):"))
             layout.addWidget(price_input)
 
+            # Out of Stock Checkbox
+            out_of_stock_checkbox = QCheckBox("Out of Stock")
+            out_of_stock_checkbox.setChecked(item.get("is_out_of_stock", False))
+            layout.addWidget(out_of_stock_checkbox)
+
             # Update Button
             update_button = QPushButton("Save Changes")
             update_button.setStyleSheet(f"background-color: {colors.color_1}; color: {colors.color_3};")
             update_button.clicked.connect(lambda: self.update_item(
-                item["item_id"], category_dropdown.currentData(), is_veg_dropdown.currentText(),
-                name_input.text(), desc_input.text(), price_input.text(), dialog
+                item["item_id"], 
+                category_dropdown.currentData(), 
+                is_veg_dropdown.currentText(),
+                name_input.text(), 
+                desc_input.text(), 
+                price_input.text(),
+                out_of_stock_checkbox.isChecked(),
+                dialog
             ))
             
             layout.addWidget(update_button)
@@ -263,7 +304,7 @@ def create_inventory_tab(restaurant_id):
             category = response.data
             return category[0]["category_name"] if category else "Unknown"
 
-        def update_item(self, item_id, category_id, is_veg, name, desc, price, dialog):
+        def update_item(self, item_id, category_id, is_veg, name, desc, price, is_out_of_stock, dialog):
             """Update an inventory item"""
             try:
                 updated_data = {
@@ -272,6 +313,7 @@ def create_inventory_tab(restaurant_id):
                     "item_name": name.strip(),
                     "item_desc": desc.strip(),
                     "price": float(price.strip()),
+                    "is_out_of_stock": is_out_of_stock
                 }
                 supabase.table("inventory").update(updated_data).eq("item_id", item_id).execute()
                 self.load_inventory()
@@ -290,4 +332,5 @@ def create_inventory_tab(restaurant_id):
             if confirmation == QMessageBox.Yes:
                 supabase.table("inventory").delete().eq("item_id", item["item_id"]).execute()
                 self.load_inventory()
+    
     return InventoryTab()
