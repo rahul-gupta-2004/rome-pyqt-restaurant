@@ -2,7 +2,7 @@ This project is the **Restaurant Owner Desktop Software** for **R.O.M.E. (Restau
 
 The application is built using **Python and PyQt5**, with a focus on a clean UI/UX that simplifies daily operations for restaurant staff.
 
----
+<br>
 
 **Key Features**
 
@@ -21,13 +21,13 @@ Restaurant details such as name, address, and contact information are shown in a
 **5. Splash Screen & Smooth Navigation**  
 The software includes a simple splash screen at startup, followed by a clear and responsive layout, allowing users to navigate between different modules effortlessly.
 
----
+<br>
 
 **Database**
 
 The backend is powered by **Supabase**, a scalable PostgreSQL-based platform. All data related to restaurants, tables, and inventory is synced in real time using Supabase's API. This allows for seamless integration between the desktop software and the web-based customer/admin panels of the R.O.M.E. ecosystem.
 
----
+<br>
 
 **Purpose**
 
