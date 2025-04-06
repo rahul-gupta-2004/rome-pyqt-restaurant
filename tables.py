@@ -123,7 +123,7 @@ def create_table_tab(restaurant_id):
                 return
 
             # Add table to the database
-            base_url = "192.168.29.30:3000/"
+            base_url = "https://rome-website-customer-admin.onrender.com/"
             qr_code_data = f"{base_url}{table_number}/{restaurant_id}"
             supabase.table("tables").insert({
                 "restaurant_id": self.restaurant_id,
