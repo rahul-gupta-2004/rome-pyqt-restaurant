@@ -1,36 +1,36 @@
-Overview
+This project is the **Restaurant Owner Desktop Software** for **R.O.M.E. (Restaurants Orders Made Easy)** — a complete restaurant order management ecosystem. It is designed to give restaurant owners a fast and intuitive interface to manage their tables, menu inventory, and profiles directly from a desktop environment using a graphical interface.
 
-This is a PyQt-based desktop application for restaurants to manage orders, tables, inventory, and sales reports.
+The application is built using **Python and PyQt5**, with a focus on a clean UI/UX that simplifies daily operations for restaurant staff.
 
-Features
-* Room & Table Management: CRUD operations with QR code generation.
-* Inventory Management: Add/update/delete food items and manage stock levels.
-* Order Management: Take and track orders per table.
-* Sales Reporting: Generate reports (daily, weekly, monthly, department-wise, item-wise).
-* User Management: Roles - Admin, Owner, Employee/Waiter.
+---
 
-Installation & Setup
-1. Install dependencies:
-```
-pip install -r requirements.txt
-```
-Run the application:
-```
-python main.py
-```
+**Key Features**
 
-File Structure
+**1. Login System**  
+Restaurant owners can securely log in using their registered credentials. Upon successful login, they are directed to their personalized dashboard.
 
-```main.py``` - Entry point for the application.
+**2. Table Management with QR Code Generation**  
+Owners can add and manage tables within their restaurant. Each time a new table is added, the application automatically generates a unique QR code that links to the digital menu for that specific table. This QR code can be printed and placed on the table for customer use.
 
-```tables.py``` - Handles table and QR code management.
+**3. Inventory Viewing**  
+Restaurant owners can view their current inventory fetched from the database. Each item displays its name, price, category, and type (veg, non-veg, egg), along with its stock status. This allows the owner to keep track of available dishes and restock when necessary.
 
-```inventory.py``` - Manages stock and product CRUD operations.
+**4. Profile Management**  
+Restaurant details such as name, address, and contact information are shown in a dedicated profile section. Owners can review their data and keep records in sync.
 
-```orders.py``` - Handles order-taking and processing.
+**5. Splash Screen & Smooth Navigation**  
+The software includes a simple splash screen at startup, followed by a clear and responsive layout, allowing users to navigate between different modules effortlessly.
 
-```reports.py``` - Generates sales reports.
+---
 
-```database/``` - Contains MySQL database connection files.
+**Database**
 
-```assets/``` - Icons, images, and other UI assets.
+The backend is powered by **Supabase**, a scalable PostgreSQL-based platform. All data related to restaurants, tables, and inventory is synced in real time using Supabase's API. This allows for seamless integration between the desktop software and the web-based customer/admin panels of the R.O.M.E. ecosystem.
+
+---
+
+**Purpose**
+
+This desktop software is developed as part of a full-stack solution to make restaurant management easier and more modern. It connects directly to the centralized database and allows restaurants to manage their digital presence without needing any web interface.
+
+By pairing this with the web portal for customers and the admin dashboard, restaurant owners have full control over their operations, all in one streamlined ecosystem.
