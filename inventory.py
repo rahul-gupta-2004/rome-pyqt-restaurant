@@ -68,7 +68,7 @@ def create_inventory_tab(restaurant_id):
             
             # Table setup
             self.table_widget = QTableWidget()
-            self.table_widget.setColumnCount(9)  # Added column for out of stock
+            self.table_widget.setColumnCount(9)
             self.table_widget.setRowCount(1)
             self.table_widget.setHorizontalHeaderLabels(["", "", "", "", "", "", "", "", ""])
             self.table_widget.horizontalHeader().setVisible(False)
