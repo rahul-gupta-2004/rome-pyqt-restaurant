@@ -1,4 +1,3 @@
-# home.py
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QTabWidget, QFrame, QPushButton
 from PyQt5.QtCore import Qt
 import colors
